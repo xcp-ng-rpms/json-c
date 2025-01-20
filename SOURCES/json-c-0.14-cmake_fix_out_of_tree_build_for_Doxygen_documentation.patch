@@ -1,0 +1,59 @@
+From 8f3592b3d59874b4dd230a741fad3ffa99223a45 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Mon, 18 May 2020 18:20:01 +0200
+Subject: [PATCH] CMake: Fix out-of-tree build for Doxygen documentation.
+
+---
+ CMakeLists.txt          | 9 +++++----
+ Doxyfile => Doxyfile.in | 4 ++--
+ 2 files changed, 7 insertions(+), 6 deletions(-)
+ rename Doxyfile => Doxyfile.in (99%)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 901eb6e364..f58301c71a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -368,13 +368,14 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation(
+ 
+ if (DOXYGEN_FOUND)
+ 
++	configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in
++	  ${PROJECT_BINARY_DIR}/Doxyfile)
++	message(STATUS "Written ${PROJECT_BINARY_DIR}/Doxyfile")
++
+ 	add_custom_target(doc
+-	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Doxyfile
++	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+ 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+ 
+-	# request to configure the file
+-	configure_file(Doxyfile Doxyfile)
+-
+ else (DOXYGEN_FOUND)
+ 	message("Warning: doxygen not found, the 'doc' target will not be included")
+ endif(DOXYGEN_FOUND)
+diff --git a/Doxyfile b/Doxyfile.in
+similarity index 99%
+rename from Doxyfile
+rename to Doxyfile.in
+index 06d54e661e..42a08535c2 100644
+--- a/Doxyfile
++++ b/Doxyfile.in
+@@ -38,7 +38,7 @@ PROJECT_NAME           = json-c
+ # could be handy for archiving the generated documentation or if some version
+ # control system is used.
+ 
+-PROJECT_NUMBER         = 0.14
++PROJECT_NUMBER         = @PROJECT_VERSION@
+ 
+ # Using the PROJECT_BRIEF tag one can provide an optional one line description
+ # for a project that appears at the top of each page and should give viewer a
+@@ -753,7 +753,7 @@ WARN_LOGFILE           =
+ # spaces.
+ # Note: If this tag is empty the current directory is searched.
+ 
+-INPUT                  =
++INPUT                  = @CMAKE_SOURCE_DIR@ @CMAKE_BINARY_DIR@
+ 
+ # This tag can be used to specify the character encoding of the source files
+ # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

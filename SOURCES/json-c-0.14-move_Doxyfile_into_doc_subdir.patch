@@ -1,0 +1,121 @@
+From 61e2bae5111b49a788fe4c236b473dc86250a7fe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Mon, 18 May 2020 20:32:35 +0200
+Subject: [PATCH 1/2] doc: Move Doxyfile into doc subdir
+
+---
+ .gitignore                     |  2 +-
+ CMakeLists.txt                 | 19 +------------------
+ doc/CMakeLists.txt             | 16 ++++++++++++++++
+ Doxyfile.in => doc/Doxyfile.in |  2 +-
+ 4 files changed, 19 insertions(+), 20 deletions(-)
+ create mode 100644 doc/CMakeLists.txt
+ rename Doxyfile.in => doc/Doxyfile.in (99%)
+
+diff --git a/.gitignore b/.gitignore
+index 958ace3ac1..1cdaf9bdba 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -83,7 +83,7 @@
+ /Testing/
+ 
+ # ...and build artifacts.
+-/doc
++/doc/html
+ /libjson-c.a
+ /libjson-c.so
+ /libjson-c.so.*
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f58301c71a..ec17697170 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -361,24 +361,7 @@ set(JSON_C_SOURCES
+ include_directories(${PROJECT_SOURCE_DIR})
+ include_directories(${PROJECT_BINARY_DIR})
+ 
+-# generate doxygen documentation for json-c API
+-
+-find_package(Doxygen)
+-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation(requires Doxygen)" ${DOXYGEN_FOUND})
+-
+-if (DOXYGEN_FOUND)
+-
+-	configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in
+-	  ${PROJECT_BINARY_DIR}/Doxyfile)
+-	message(STATUS "Written ${PROJECT_BINARY_DIR}/Doxyfile")
+-
+-	add_custom_target(doc
+-	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+-		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+-
+-else (DOXYGEN_FOUND)
+-	message("Warning: doxygen not found, the 'doc' target will not be included")
+-endif(DOXYGEN_FOUND)
++add_subdirectory(doc)
+ 
+ # uninstall
+ add_custom_target(uninstall
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+new file mode 100644
+index 0000000000..4872d8e8ad
+--- /dev/null
++++ b/doc/CMakeLists.txt
+@@ -0,0 +1,16 @@
++# generate doxygen documentation for json-c API
++
++find_package(Doxygen)
++
++if (DOXYGEN_FOUND)
++
++	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
++	  ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
++	message(STATUS "Wrote ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
++
++	add_custom_target(doc
++	COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
++
++else (DOXYGEN_FOUND)
++	message("Warning: doxygen not found, the 'doc' target will not be included")
++endif(DOXYGEN_FOUND)
+diff --git a/Doxyfile.in b/doc/Doxyfile.in
+similarity index 99%
+rename from Doxyfile.in
+rename to doc/Doxyfile.in
+index 42a08535c2..ce8d8ff78c 100644
+--- a/Doxyfile.in
++++ b/doc/Doxyfile.in
+@@ -58,7 +58,7 @@ PROJECT_LOGO           =
+ # entered, it will be relative to the location where doxygen was started. If
+ # left blank the current directory will be used.
+ 
+-OUTPUT_DIRECTORY       = doc
++OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@
+ 
+ # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
+ # directories (in 2 levels) under the output directory of each output format and
+
+From 1e94da779a9aa107690e4f2921ab4d0300aca579 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Mon, 18 May 2020 20:36:05 +0200
+Subject: [PATCH 2/2] CMake: Fix grammar: written -> wrote.
+
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ec17697170..333513c5e0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -237,9 +237,9 @@ endif()
+ 
+ # Once we've done basic symbol/header searches let's add them in.
+ configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.in        ${PROJECT_BINARY_DIR}/config.h)
+-message(STATUS "Written ${PROJECT_BINARY_DIR}/config.h")
++message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
+ configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
+-message(STATUS "Written ${PROJECT_BINARY_DIR}/json_config.h")
++message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
+ 
+ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")

@@ -1,0 +1,22 @@
+From 3008401b2a8f5b25bf5665cafa22b335d9ffdb3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Mon, 18 May 2020 17:00:17 +0200
+Subject: [PATCH] test_deep_copy: Fix assertion value.
+
+---
+ tests/test_deep_copy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_deep_copy.c b/tests/test_deep_copy.c
+index b6c1b999f4..34ef1fe5d3 100644
+--- a/tests/test_deep_copy.c
++++ b/tests/test_deep_copy.c
+@@ -126,7 +126,7 @@ int main(int argc, char **argv)
+ 	src3 = json_tokener_parse(json_str3);
+ 
+ 	assert(src1 != NULL);
+-	assert(src1 != NULL);
++	assert(src2 != NULL);
+ 	assert(src3 != NULL);
+ 
+ 	printf("PASSED - loaded input data\n");

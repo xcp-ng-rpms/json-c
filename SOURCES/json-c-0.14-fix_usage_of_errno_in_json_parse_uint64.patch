@@ -1,0 +1,74 @@
+From 003b58782b12798da3da8b952152988a88dfb532 Mon Sep 17 00:00:00 2001
+From: Pierce Lopez <pierce.lopez@gmail.com>
+Date: Sun, 10 May 2020 13:20:02 -0400
+Subject: [PATCH] fix json_parse_uint64() usage of errno
+
+introduced in #542
+fixes #601
+---
+ json_util.c                     | 8 +++-----
+ json_util.h                     | 1 +
+ tests/test_parse_int64.expected | 8 ++++----
+ 3 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/json_util.c b/json_util.c
+index d3ee47df72..e8e2ec6bcb 100644
+--- a/json_util.c
++++ b/json_util.c
+@@ -245,19 +245,17 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
+ {
+ 	char *end = NULL;
+ 	uint64_t val;
+-	errno = 1;
+ 
++	errno = 0;
+ 	while (*buf == ' ')
+-	{
+ 		buf++;
+-	}
+ 	if (*buf == '-')
+-		errno = 0;
++		return 1;  /* error: uint cannot be negative */
+ 
+ 	val = strtoull(buf, &end, 10);
+ 	if (end != buf)
+ 		*retval = val;
+-	return ((errno == 0) || (end == buf)) ? 1 : 0;
++	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
+ }
+ 
+ #ifndef HAVE_REALLOC
+diff --git a/json_util.h b/json_util.h
+index 2a4b6c19bd..7520f036c4 100644
+--- a/json_util.h
++++ b/json_util.h
+@@ -100,6 +100,7 @@ JSON_EXPORT int json_object_to_fd(int fd, struct json_object *obj, int flags);
+  */
+ JSON_EXPORT const char *json_util_get_last_err(void);
+ 
++/* these parsing helpers return zero on success */
+ JSON_EXPORT int json_parse_int64(const char *buf, int64_t *retval);
+ JSON_EXPORT int json_parse_uint64(const char *buf, uint64_t *retval);
+ JSON_EXPORT int json_parse_double(const char *buf, double *retval);
+diff --git a/tests/test_parse_int64.expected b/tests/test_parse_int64.expected
+index f4c5750b0b..6dca94b470 100644
+--- a/tests/test_parse_int64.expected
++++ b/tests/test_parse_int64.expected
+@@ -34,13 +34,13 @@ buf=123 parseit=0, value=123
+ ==========json_parse_uint64() test===========
+ buf=x parseit=1, value=666 
+ buf=0 parseit=0, value=0 
+-buf=-0 parseit=1, value=0 
++buf=-0 parseit=1, value=666 
+ buf=00000000 parseit=0, value=0 
+-buf=-00000000 parseit=1, value=0 
++buf=-00000000 parseit=1, value=666 
+ buf=1 parseit=0, value=1 
+ buf=2147483647 parseit=0, value=2147483647 
+-buf=-1 parseit=1, value=18446744073709551615 
+-buf=-9223372036854775808 parseit=1, value=9223372036854775808 
++buf=-1 parseit=1, value=666 
++buf=-9223372036854775808 parseit=1, value=666 
+ buf=   1 parseit=0, value=1 
+ buf=00001234 parseit=0, value=1234 
+ buf=0001234x parseit=0, value=1234 

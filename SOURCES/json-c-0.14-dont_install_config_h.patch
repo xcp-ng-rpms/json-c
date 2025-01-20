@@ -1,0 +1,23 @@
+From 228881c8fc287182f284a58d8279a32fbeae0b7f Mon Sep 17 00:00:00 2001
+From: Eric Haszlakiewicz <erh+git@nimenees.com>
+Date: Tue, 21 Apr 2020 01:13:21 +0000
+Subject: [PATCH] Issue #585: don't install config.h
+
+(cherry picked from commit 8b511c402b73d1d8b195991891c8d44859cb57ec)
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ba692fff69..c51f477c5f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -299,7 +299,7 @@ if ($ENV{VALGRIND})
+ endif()
+ 
+ set(JSON_C_PUBLIC_HEADERS
+-    ${PROJECT_BINARY_DIR}/config.h
++    # Note: config.h is _not_ included here
+     ${PROJECT_BINARY_DIR}/json_config.h
+ 
+     ${PROJECT_SOURCE_DIR}/json.h

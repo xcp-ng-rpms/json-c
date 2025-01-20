@@ -26,7 +26,7 @@
 
 Name:           json-c
 Version:        0.14
-Release:        11%{?dist}
+Release:        11.0.tee.1%{?dist}
 Summary:        JSON implementation in C
 
 License:        MIT
@@ -99,6 +99,7 @@ doxygen -s -u doc/Doxyfile.in
   -DDISABLE_WERROR:BOOL=ON           \
   -DENABLE_RDRAND:BOOL=ON            \
   -DENABLE_THREADING:BOOL=ON         \
+  -DCMAKE_C_STANDARD=99              \
   -G Ninja
 %cmake_build --target all doc
 
@@ -150,6 +151,10 @@ unset USE_VALGRIND
 
 
 %changelog
+* Mon Jan 20 2025 Thierry Escande <thierry.escande@vates.tech> - 0.14-11.1
+- Imported from json-c-0.14-11.el9.src.rpm
+- Set CMAKE_C_STANDARD=99
+
 * Tue Sep 14 2021 Tomas Korbar <tkorbar@redhat.com> - 0.14-11
 - Start providing versioned symbols
 - Resolves: rhbz#2001067
